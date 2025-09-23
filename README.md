@@ -1,4 +1,3 @@
-```markdown
 # Productivity Hub - Backend ⚡️
 
 This is the **ASP.NET Core Web API backend** for the Productivity Hub app.  
