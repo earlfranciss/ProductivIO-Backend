@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProductivIOBackend.Data;
 using ProductivIOBackend.Models;
+using ProductivIOBackend.DTOs;
 using ProductivIOBackend.Repositories.Interfaces;
 using ProductivIOBackend.Services.Interfaces;
 
@@ -10,23 +11,43 @@ namespace ProductivIOBackend.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
+        private readonly PasswordHasher<User> _passwordHasher;
 
         public AuthService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
+            _passwordHasher = new PasswordHasher<User>();
         }
 
-        public async Task<User?> ValidateUserAsync(string email, string password)
+        public async Task<User?> ValidateUserAsync(string email)
         {
-            var user = await _userRepository.GetUserAsync(email);
+            return await _userRepository.GetUserAsync(email);
+        }
 
-            if (user == null)
-                return null;
+        public PasswordVerificationResult VerifyPassword(User user, string password)
+        {
+            return _passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        }
 
-            var passwordHasher = new PasswordHasher<User>();
-            var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        public async Task<(bool Success, string Message, User? User)> RegisterUserAsync(RegisterRequest request)
+        {
+            // Check if email already exists
+            var existingUser = await _userRepository.GetUserAsync(request.Email);
+            if (existingUser != null)
+                return (false, "Email already registered", null);
 
-            return result == PasswordVerificationResult.Failed ? null : user;
+            // Create new user and hash password
+            var newUser = new User
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Password = _passwordHasher.HashPassword(null!, request.Password),
+                CreatedAt = DateTime.Now
+            };
+
+            // Save to database
+            var savedUser = await _userRepository.AddUserAsync(newUser);
+            return (true, "User created successfully", savedUser);
         }
     }
 }

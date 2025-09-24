@@ -8,10 +8,16 @@ using ProductivIOBackend.Repositories;
 using ProductivIOBackend.Services;
 using ProductivIOBackend.Repositories.Interfaces;
 using ProductivIOBackend.Services.Interfaces;
-
+using DotNetEnv;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    Env.Load();
+}
+
 
 // Add services
 builder.Services.AddControllers();
@@ -62,24 +68,43 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+// JWT config
+var jwtConfig = builder.Configuration.GetSection("Jwt");
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtConfig["Key"];
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? jwtConfig["Issuer"];
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? jwtConfig["Audience"];
+var jwtExpireMinutes = int.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRE_MINUTES") ?? jwtConfig["ExpireMinutes"], out var minutes)
+    ? minutes
+    : 120;
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new Exception("JWT_KEY is not configured in environment variables or .env file");
+}
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
+var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key)
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
 
 builder.Services.AddAuthorization();
 
@@ -92,6 +117,7 @@ builder.Services.AddCors(opt =>
             .AllowAnyMethod());
 });
 
+// DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
@@ -99,23 +125,19 @@ builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 // Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Asset Management API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProductivIO API v1");
         c.RoutePrefix = string.Empty;
     });
+    // Configure the HTTP request pipeline.
+    app.MapOpenApi();
 }
-app.UseCors("AllowFrontend");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

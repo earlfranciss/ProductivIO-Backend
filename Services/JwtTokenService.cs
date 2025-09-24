@@ -19,23 +19,31 @@ namespace ProductivIOBackend.Services
 
         public string GenerateToken(User user)
         {
-            var jwtSettings = _config.GetSection("Jwt");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") 
+                         ?? _config["Jwt:Key"];
+
+            if (string.IsNullOrWhiteSpace(jwtKey))
+                throw new InvalidOperationException("JWT_KEY is missing or empty.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new List<Claim>
+            var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Name),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim("userId", user.Id.ToString()),
-                new Claim("name", user.Name),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim("name", user.Name)
             };
 
             var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
+                issuer: Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _config["Jwt:Issuer"],
+                audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["ExpireMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(
+                    Convert.ToDouble(Environment.GetEnvironmentVariable("JWT_EXPIRE_MINUTES")
+                        ?? _config["Jwt:ExpireMinutes"])
+                ),
                 signingCredentials: creds
             );
 

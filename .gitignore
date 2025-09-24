@@ -5,6 +5,7 @@ Thumbs.db
 *.log
 
 # ---- .NET (backend) ----
+.env
 bin/
 obj/
 # User secrets / local config (keep real secrets out of Git)
