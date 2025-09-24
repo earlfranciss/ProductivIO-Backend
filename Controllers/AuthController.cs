@@ -79,7 +79,7 @@ namespace ProductivIOBackend.Controllers
             // Register user
             var result = await _authService.RegisterUserAsync(registerRequest);
 
-            if (!result.Success)
+            if (!result.Success || result.User == null)
                 return BadRequest(result.Message);
 
             // Hide password before sending back

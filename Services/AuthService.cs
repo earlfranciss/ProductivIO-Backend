@@ -29,25 +29,26 @@ namespace ProductivIOBackend.Services
             return _passwordHasher.VerifyHashedPassword(user, user.Password, password);
         }
 
-        public async Task<(bool Success, string Message, User? User)> RegisterUserAsync(RegisterRequest request)
+        public async Task<AuthResult> RegisterUserAsync(RegisterRequest request)
         {
             // Check if email already exists
             var existingUser = await _userRepository.GetUserAsync(request.Email);
             if (existingUser != null)
-                return (false, "Email already registered", null);
+                return new AuthResult { Success = false, Message = "Email already registered."};
 
             // Create new user and hash password
             var newUser = new User
             {
                 Name = request.Name,
                 Email = request.Email,
-                Password = _passwordHasher.HashPassword(null!, request.Password),
                 CreatedAt = DateTime.Now
             };
 
+            newUser.Password = _passwordHasher.HashPassword(newUser, request.Password);
+
             // Save to database
             var savedUser = await _userRepository.AddUserAsync(newUser);
-            return (true, "User created successfully", savedUser);
+            return new AuthResult { Success= true, Message = "User created successfully.", User = savedUser };
         }
     }
 }
