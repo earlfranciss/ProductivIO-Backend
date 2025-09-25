@@ -8,18 +8,18 @@ using ProductivIOBackend.Services.Interfaces;
 
 namespace ProductivIOBackend.Services
 {
-    public class JwtTokenService : ITokenService
+    public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;
 
-        public JwtTokenService(IConfiguration config)
+        public TokenService(IConfiguration config)
         {
             _config = config;
         }
 
         public string GenerateToken(User user)
         {
-            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") 
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
                          ?? _config["Jwt:Key"];
 
             if (string.IsNullOrWhiteSpace(jwtKey))

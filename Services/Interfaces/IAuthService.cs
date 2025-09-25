@@ -6,8 +6,7 @@ namespace ProductivIOBackend.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<User?> ValidateUserAsync(string email);
-        PasswordVerificationResult VerifyPassword(User user, string password);
+        Task<AuthResult> LoginAsync(LoginRequest loginRequest);
         Task<AuthResult> RegisterUserAsync(RegisterRequest request);
     }
 

@@ -11,7 +11,7 @@ namespace ProductivIOBackend.Models
         public int UserID { get; set; }
 
         [ForeignKey("UserID")]
-        public User User { get; set; }
+        public required User User { get; set; }
 
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = string.Empty;

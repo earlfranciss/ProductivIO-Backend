@@ -11,7 +11,7 @@ namespace ProductivIOBackend.Models
         public int UserID { get; set; }
 
         [ForeignKey("UserID")]
-        public User User { get; set; }
+        public required User User { get; set; }
 
         [Required(ErrorMessage = "Please set time duration.")]
         public TimeSpan Duration { get; set; } = TimeSpan.FromSeconds(0);

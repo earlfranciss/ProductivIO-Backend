@@ -6,10 +6,12 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using ProductivIOBackend.Repositories;
 using ProductivIOBackend.Services;
+using ProductivIOBackend.Validations;
 using ProductivIOBackend.Repositories.Interfaces;
 using ProductivIOBackend.Services.Interfaces;
 using DotNetEnv;
-
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +20,11 @@ if (builder.Environment.IsDevelopment())
     Env.Load();
 }
 
-
 // Add services
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
 builder.Services.AddEndpointsApiExplorer();
 
 // Add services to the container.
@@ -120,7 +124,9 @@ builder.Services.AddCors(opt =>
 // DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+
 
 
 var app = builder.Build();

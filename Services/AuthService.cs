@@ -11,30 +11,47 @@ namespace ProductivIOBackend.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
-        private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IPasswordService _passwordService;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(IUserRepository userRepository, IPasswordService passwordService, ITokenService tokenService)
         {
             _userRepository = userRepository;
-            _passwordHasher = new PasswordHasher<User>();
+            _passwordService = passwordService;
+            _tokenService = tokenService;
         }
 
-        public async Task<User?> ValidateUserAsync(string email)
+        public async Task<AuthResult> LoginAsync(LoginRequest request)
         {
-            return await _userRepository.GetUserAsync(email);
-        }
+            // Find user
+            var user = await _userRepository.GetUserAsync(request.Email);
+            if (user == null)
+                return AuthResult.Failure("Email does not exist.");
 
-        public PasswordVerificationResult VerifyPassword(User user, string password)
-        {
-            return _passwordHasher.VerifyHashedPassword(user, user.Password, password);
-        }
+            // Verify password
+            var result = _passwordService.VerifyPassword(user, user.Password, request.Password);
+            if (result == PasswordVerificationResult.Failed)
+                return AuthResult.Failure("Incorrect password.");
+
+            // Rehash password to make password stronger over time
+            if (result == PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                user.Password = _passwordService.HashPassword(user, request.Password);
+                await _userRepository.UpdateUserAsync(user);
+            }
+
+            // Generate JWT
+            var token = _tokenService.GenerateToken(user);
+
+            return AuthResult.Successful(user, token);
+        }   
 
         public async Task<AuthResult> RegisterUserAsync(RegisterRequest request)
         {
             // Check if email already exists
             var existingUser = await _userRepository.GetUserAsync(request.Email);
             if (existingUser != null)
-                return new AuthResult { Success = false, Message = "Email already registered."};
+                return AuthResult.Failure("Email already registered.");
 
             // Create new user and hash password
             var newUser = new User
@@ -44,11 +61,14 @@ namespace ProductivIOBackend.Services
                 CreatedAt = DateTime.Now
             };
 
-            newUser.Password = _passwordHasher.HashPassword(newUser, request.Password);
+            newUser.Password = _passwordService.HashPassword(newUser, request.Password);
 
             // Save to database
             var savedUser = await _userRepository.AddUserAsync(newUser);
-            return new AuthResult { Success= true, Message = "User created successfully.", User = savedUser };
+            if (savedUser == null)
+                return AuthResult.Failure("User could not be created.");
+
+            return new AuthResult { Success = true, Message = "User created successfully.", User = new UserResponse(savedUser) };
         }
     }
 }

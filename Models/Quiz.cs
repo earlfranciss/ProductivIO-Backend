@@ -11,7 +11,7 @@ namespace ProductivIOBackend.Models
         public int UserID { get; set; }
 
         [ForeignKey("UserID")]
-        public User User { get; set; }
+        public required User User { get; set; }
 
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = string.Empty;
@@ -34,7 +34,7 @@ namespace ProductivIOBackend.Models
         public int QuizID { get; set; }
 
         [ForeignKey("QuizID")]
-        public Quizzes Quiz { get; set; }
+        public required Quizzes Quiz { get; set; }
 
         [Required(ErrorMessage = "Question is required.")]
         public string Question { get; set; } = string.Empty;
@@ -57,7 +57,7 @@ namespace ProductivIOBackend.Models
         public int QuestionId { get; set; }
         
         [ForeignKey("QuestionId")]
-        public QuizQuestion QuizQuestion { get; set; } 
+        public required QuizQuestion QuizQuestion { get; set; } 
 
         [Required(ErrorMessage = "Answer is required.")] 
         public string Answer { get; set; } = string.Empty;

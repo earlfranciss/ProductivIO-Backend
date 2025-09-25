@@ -11,7 +11,7 @@ namespace ProductivIOBackend.Models
         public int UserID { get; set; }
 
         [ForeignKey("UserID")]
-        public User User { get; set; }
+        public required User User { get; set; } 
 
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = string.Empty;
@@ -32,7 +32,7 @@ namespace ProductivIOBackend.Models
         public int FlashcardId { get; set; }
 
         [ForeignKey("FlashcardId")]
-        public Flashcards Flashcard { get; set; }
+        public required Flashcards Flashcard { get; set; }
 
         [Required(ErrorMessage = "Question is required.")]
         public string Question { get; set; } = string.Empty;
@@ -56,7 +56,7 @@ namespace ProductivIOBackend.Models
         public int QuestionId { get; set; }
 
         [ForeignKey("QuestionId")]
-        public FlashcardQuestion FlashcardQuestion { get; set; }
+        public required FlashcardQuestion FlashcardQuestion { get; set; }
 
         [Required(ErrorMessage = "Answer is required.")]
         public string Answer { get; set; } = string.Empty;

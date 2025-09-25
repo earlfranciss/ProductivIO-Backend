@@ -34,64 +34,22 @@ namespace ProductivIOBackend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            if (string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
-                return BadRequest("Email and password are required");
+            var result = await _authService.LoginAsync(loginRequest);
+            if (!result.Success)
+                return Unauthorized(result.Message);
 
-            // Find user
-            var user = await _authService.ValidateUserAsync(loginRequest.Email);
-            if (user == null)
-                return Unauthorized("Email does not exist.");
-
-            // Verify password
-            var result = _authService.VerifyPassword(user, loginRequest.Password);
-            if (result == PasswordVerificationResult.Failed)
-                return Unauthorized("Incorrect password.");
-
-            // Rehash password to make password stronger over time
-            if (result == PasswordVerificationResult.SuccessRehashNeeded)
-            {
-                await _userRepository.UpdateUserAsync(user);
-            }
-
-            // Generate JWT
-            var token = _tokenService.GenerateToken(user);
-
-            // Hide password before sending back
-            var userDto = new UserResponse
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                CreatedAt = user.CreatedAt,
-            };
-
-            return Ok(new { token, user = userDto });
+            return Ok(new { token = result.Token, user = result.User });
         }
 
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {
-            // Checks for missing inputs
-            if (string.IsNullOrEmpty(registerRequest.Name) || string.IsNullOrEmpty(registerRequest.Email) || string.IsNullOrEmpty(registerRequest.Password))
-                return BadRequest("Email and password are required");
-
-            // Register user
             var result = await _authService.RegisterUserAsync(registerRequest);
-
             if (!result.Success || result.User == null)
                 return BadRequest(result.Message);
 
-            // Hide password before sending back
-            var userDto = new UserResponse
-            {
-                Id = result.User.Id,
-                Name = result.User.Name,
-                Email = result.User.Email,
-                CreatedAt = result.User.CreatedAt,
-            };
-
-            return Ok(new { message = "User registered successfully.", user = userDto });
+            return Ok(new { message = result.Message, user = result.User });
         }
     }
 }
