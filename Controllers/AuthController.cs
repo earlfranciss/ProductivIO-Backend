@@ -41,7 +41,7 @@ namespace ProductivIOBackend.Controllers
             return Ok(new { token = result.Token, user = result.User });
         }
 
-
+        // POST: api/Auth/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {

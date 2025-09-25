@@ -3,6 +3,7 @@ using ProductivIOBackend.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using ProductivIOBackend.DTOs;
 
 namespace ProductivIOBackend.Controllers
 {
@@ -15,16 +16,35 @@ namespace ProductivIOBackend.Controllers
 
         public NotesController(AppDbContext db) => _db = db;
 
-        // GET : /api/Notes
+        // GET : /api/Notes?userId=1
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll([FromQuery] int userId)
         {
-            var users = await _db.Users
-                .Where(u => u.Email.Contains(""))
+            var notes = await _db.Notes
+                .Where(n => n.UserID == userId)
                 .ToListAsync();
 
-            return Ok(users);
+            return Ok(notes);
         }
-    }
 
+        // GET: /api/Notes/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetNote([FromQuery] int id)
+        {
+            var note = await _db.Notes.FindAsync(id);
+            if (note == null)
+                return NotFound("Note not found");
+
+            return Ok(note);
+        }
+
+        // POST: /api/Notes
+        [HttpPost]
+        public async Task<IActionResult> PostNote([FromQuery] NoteRequest noteRequest)
+        {
+            var note = await 
+        }
+
+
+    }
 }
