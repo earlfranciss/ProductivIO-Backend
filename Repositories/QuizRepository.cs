@@ -9,50 +9,50 @@ using ProductivIOBackend.Services;
 
 namespace ProductivIOBackend.Repositories
 {
-    public class NoteRepository : INoteRepository
+    public class QuizRepository : IQuizRepository
     {
         private readonly AppDbContext _db;
 
-        public NoteRepository(AppDbContext db)
+        public QuizRepository(AppDbContext db)
         {
             _db = db;
         }
 
-        public async Task<List<Notes>> GetAllNotesAsync(int userId)
+        public async Task<List<Quizzes>> GetAllQuizzesAsync(int userId)
         {
-            return await _db.Notes
+            return await _db.Quizzes
                 .Where(n => n.UserID == userId)
                 .ToListAsync();
         }
 
-        public async Task<Notes?> GetNoteAsync(int Id, int userId)
+        public async Task<Quizzes?> GetQuizAsync(int Id, int userId)
         {
-            return await _db.Notes
+            return await _db.Quizzes
                 .Where(n => n.Id == Id && n.UserID == userId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Notes?> AddNoteAsync(Notes note)
+        public async Task<Quizzes?> AddQuizAsync(Quizzes quiz)
         {
-            _db.Notes.Add(note);
+            _db.Quizzes.Add(quiz);
             await _db.SaveChangesAsync();
-            return note;
+            return quiz;
         }
 
-        public async Task<Notes?> UpdateNoteAsync(Notes note)
+        public async Task<Quizzes?> UpdateQuizAsync(Quizzes quiz)
         {
-            _db.Notes.Update(note);
+            _db.Quizzes.Update(quiz);
             await _db.SaveChangesAsync();
-            return note;
+            return quiz;
         }
 
-        public async Task<bool> DeleteNoteAsync(int Id, int userId)
+        public async Task<bool> DeleteQuizAsync(int Id, int userId)
         {
-            var note = await _db.Notes
+            var quiz = await _db.Quizzes
                 .FirstOrDefaultAsync(n => n.Id == Id && n.UserID == userId);
-            if (note == null) return false;
+            if (quiz == null) return false;
 
-            _db.Notes.Remove(note);
+            _db.Quizzes.Remove(quiz);
             await _db.SaveChangesAsync();
             return true;
         }

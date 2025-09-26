@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using ProductivIOBackend.DTOs;
+using ProductivIOBackend.Services.Interfaces;
 
 namespace ProductivIOBackend.Controllers
 {
@@ -12,38 +13,37 @@ namespace ProductivIOBackend.Controllers
 
     public class NotesController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly INoteService _noteService;
 
-        public NotesController(AppDbContext db) => _db = db;
+        public NotesController(INoteService noteService) {
+            _noteService = noteService;
+        }
 
         // GET : /api/Notes?userId=1
-        [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int userId)
-        {
-            var notes = await _db.Notes
-                .Where(n => n.UserID == userId)
-                .ToListAsync();
+        // [HttpGet]
+        // public async Task<IActionResult> GetAll([FromQuery] int userId)
+        // {
 
-            return Ok(notes);
-        }
+        //     return Ok(notes);
+        // }
 
-        // GET: /api/Notes/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetNote([FromQuery] int id)
-        {
-            var note = await _db.Notes.FindAsync(id);
-            if (note == null)
-                return NotFound("Note not found");
+        // // GET: /api/Notes/{id}
+        // [HttpGet("{id}")]
+        // public async Task<IActionResult> GetNote([FromQuery] int id)
+        // {
+        //     var note = await _db.Notes.FindAsync(id);
+        //     if (note == null)
+        //         return NotFound("Note not found");
 
-            return Ok(note);
-        }
+        //     return Ok(note);
+        // }
 
-        // POST: /api/Notes
-        [HttpPost]
-        public async Task<IActionResult> PostNote([FromQuery] NoteRequest noteRequest)
-        {
-            var note = await 
-        }
+        // // POST: /api/Notes
+        // [HttpPost]
+        // public async Task<IActionResult> PostNote([FromQuery] NoteRequest noteRequest)
+        // {
+        //     var note = await _db.Notes.
+        // }
 
 
     }

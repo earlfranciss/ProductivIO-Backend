@@ -9,5 +9,6 @@ namespace ProductivIOBackend.Repositories.Interfaces
         Task<Notes?> GetNoteAsync(int Id, int userId);
         Task<Notes?> UpdateNoteAsync(Notes note);
         Task<Notes?> AddNoteAsync(Notes note);
+        Task<bool> DeleteNoteAsync(int Id, int userId);
     }
 }

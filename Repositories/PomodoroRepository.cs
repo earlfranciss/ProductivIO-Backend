@@ -9,50 +9,50 @@ using ProductivIOBackend.Services;
 
 namespace ProductivIOBackend.Repositories
 {
-    public class NoteRepository : INoteRepository
+    public class PomodoroRepository : IPomodoroRepository
     {
         private readonly AppDbContext _db;
 
-        public NoteRepository(AppDbContext db)
+        public PomodoroRepository(AppDbContext db)
         {
             _db = db;
         }
 
-        public async Task<List<Notes>> GetAllNotesAsync(int userId)
+        public async Task<List<Pomodoro>> GetAllPomodoroAsync(int userId)
         {
-            return await _db.Notes
+            return await _db.Pomodoros
                 .Where(n => n.UserID == userId)
                 .ToListAsync();
         }
 
-        public async Task<Notes?> GetNoteAsync(int Id, int userId)
+        public async Task<Pomodoro?> GetPomodoroAsync(int Id, int userId)
         {
-            return await _db.Notes
+            return await _db.Pomodoros
                 .Where(n => n.Id == Id && n.UserID == userId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Notes?> AddNoteAsync(Notes note)
+        public async Task<Pomodoro?> AddPomodoroAsync(Pomodoro pomodoro)
         {
-            _db.Notes.Add(note);
+            _db.Pomodoros.Add(pomodoro);
             await _db.SaveChangesAsync();
-            return note;
+            return pomodoro;
         }
 
-        public async Task<Notes?> UpdateNoteAsync(Notes note)
+        public async Task<Pomodoro?> UpdatePomodoroAsync(Pomodoro pomodoro)
         {
-            _db.Notes.Update(note);
+            _db.Pomodoros.Update(pomodoro);
             await _db.SaveChangesAsync();
-            return note;
+            return pomodoro;
         }
 
-        public async Task<bool> DeleteNoteAsync(int Id, int userId)
+        public async Task<bool> DeletePomodoroAsync(int Id, int userId)
         {
-            var note = await _db.Notes
+            var pomodoro = await _db.Pomodoros
                 .FirstOrDefaultAsync(n => n.Id == Id && n.UserID == userId);
-            if (note == null) return false;
+            if (pomodoro == null) return false;
 
-            _db.Notes.Remove(note);
+            _db.Pomodoros.Remove(pomodoro);
             await _db.SaveChangesAsync();
             return true;
         }

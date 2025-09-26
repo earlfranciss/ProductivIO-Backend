@@ -4,7 +4,7 @@ using ProductivIOBackend.Services.Interfaces;
 
 namespace ProductivIOBackend.Services
 {
-    public class NoteService : INoteService
+    public class FlashcardService : IFlashcardService
     {
         public async Task<NoteResponse> CreateNote(NoteRequest noteRequest)
         {

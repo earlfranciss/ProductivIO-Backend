@@ -19,15 +19,10 @@ namespace ProductivIOBackend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly ITokenService _tokenService;
-        private readonly IUserRepository _userRepository;
 
-
-        public AuthController(IAuthService authService, ITokenService tokenService, IUserRepository userRepository)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
-            _tokenService = tokenService;
-            _userRepository = userRepository;
         }
 
         // POST: api/Auth/login

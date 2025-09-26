@@ -9,50 +9,50 @@ using ProductivIOBackend.Services;
 
 namespace ProductivIOBackend.Repositories
 {
-    public class NoteRepository : INoteRepository
+    public class FlashcardRepository : IFlashcardRepository
     {
         private readonly AppDbContext _db;
 
-        public NoteRepository(AppDbContext db)
+        public FlashcardRepository(AppDbContext db)
         {
             _db = db;
         }
 
-        public async Task<List<Notes>> GetAllNotesAsync(int userId)
+        public async Task<List<Flashcards>> GetAllFlashcardsAsync(int userId)
         {
-            return await _db.Notes
+            return await _db.Flashcards
                 .Where(n => n.UserID == userId)
                 .ToListAsync();
         }
 
-        public async Task<Notes?> GetNoteAsync(int Id, int userId)
+        public async Task<Flashcards?> GetFlashcardAsync(int Id, int userId)
         {
-            return await _db.Notes
+            return await _db.Flashcards
                 .Where(n => n.Id == Id && n.UserID == userId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Notes?> AddNoteAsync(Notes note)
+        public async Task<Flashcards?> AddFlashcardAsync(Flashcards flashcard)
         {
-            _db.Notes.Add(note);
+            _db.Flashcards.Add(flashcard);
             await _db.SaveChangesAsync();
-            return note;
+            return flashcard;
         }
 
-        public async Task<Notes?> UpdateNoteAsync(Notes note)
+        public async Task<Flashcards?> UpdateFlashcardAsync(Flashcards flashcard)
         {
-            _db.Notes.Update(note);
+            _db.Flashcards.Update(flashcard);
             await _db.SaveChangesAsync();
-            return note;
+            return flashcard;
         }
 
-        public async Task<bool> DeleteNoteAsync(int Id, int userId)
+        public async Task<bool> DeleteFlashcardAsync(int Id, int userId)
         {
-            var note = await _db.Notes
+            var flashcard = await _db.Flashcards
                 .FirstOrDefaultAsync(n => n.Id == Id && n.UserID == userId);
-            if (note == null) return false;
+            if (flashcard == null) return false;
 
-            _db.Notes.Remove(note);
+            _db.Flashcards.Remove(flashcard);
             await _db.SaveChangesAsync();
             return true;
         }

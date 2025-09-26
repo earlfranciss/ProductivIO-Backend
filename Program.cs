@@ -121,14 +121,23 @@ builder.Services.AddCors(opt =>
             .AllowAnyMethod());
 });
 
-// DI
+// Dependency Injection
+//Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+builder.Services.AddScoped<IPomodoroRepository, PomodoroRepository>();
+builder.Services.AddScoped<IFlashcardRepository, FlashcardRepository>();
+//Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<INoteService, NoteService>();
-
-
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IPomodoroService, PomodoroService>();
+builder.Services.AddScoped<IFlashcardService, FlashcardService>();
 
 var app = builder.Build();
 

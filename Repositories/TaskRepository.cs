@@ -9,50 +9,50 @@ using ProductivIOBackend.Services;
 
 namespace ProductivIOBackend.Repositories
 {
-    public class NoteRepository : INoteRepository
+    public class TaskRepository : ITaskRepository
     {
         private readonly AppDbContext _db;
 
-        public NoteRepository(AppDbContext db)
+        public TaskRepository(AppDbContext db)
         {
             _db = db;
         }
 
-        public async Task<List<Notes>> GetAllNotesAsync(int userId)
+        public async Task<List<Tasks>> GetAllTasksAsync(int userId)
         {
-            return await _db.Notes
+            return await _db.Tasks
                 .Where(n => n.UserID == userId)
                 .ToListAsync();
         }
 
-        public async Task<Notes?> GetNoteAsync(int Id, int userId)
+        public async Task<Tasks?> GetTaskAsync(int Id, int userId)
         {
-            return await _db.Notes
+            return await _db.Tasks
                 .Where(n => n.Id == Id && n.UserID == userId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Notes?> AddNoteAsync(Notes note)
+        public async Task<Tasks?> AddTaskAsync(Tasks task)
         {
-            _db.Notes.Add(note);
+            _db.Tasks.Add(task);
             await _db.SaveChangesAsync();
-            return note;
+            return task;
         }
 
-        public async Task<Notes?> UpdateNoteAsync(Notes note)
+        public async Task<Tasks?> UpdateTaskAsync(Tasks task)
         {
-            _db.Notes.Update(note);
+            _db.Tasks.Update(task);
             await _db.SaveChangesAsync();
-            return note;
+            return task;
         }
 
-        public async Task<bool> DeleteNoteAsync(int Id, int userId)
+        public async Task<bool> DeleteTaskAsync(int Id, int userId)
         {
-            var note = await _db.Notes
+            var task = await _db.Tasks
                 .FirstOrDefaultAsync(n => n.Id == Id && n.UserID == userId);
-            if (note == null) return false;
+            if (task == null) return false;
 
-            _db.Notes.Remove(note);
+            _db.Tasks.Remove(task);
             await _db.SaveChangesAsync();
             return true;
         }
