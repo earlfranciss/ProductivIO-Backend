@@ -40,8 +40,8 @@ It handles data storage, authentication, and API endpoints for notes, tasks, Pom
 ### Installation
 ```bash
 # Clone the backend repo
-git clone https://github.com/your-username/productivity-hub-backend.git
-cd productivity-hub-backend
+git clone https://github.com/earlfranciss/ProductivIO-Backend.git
+cd ProductivIO-Backend
 
 # Restore dependencies
 dotnet restore
