@@ -56,7 +56,8 @@ namespace ProductivIOBackend.Services
             // Create new user and hash password
             var newUser = new User
             {
-                Name = request.Name,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
                 Email = request.Email,
                 CreatedAt = DateTime.Now
             };

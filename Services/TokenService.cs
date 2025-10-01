@@ -33,7 +33,7 @@ namespace ProductivIOBackend.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim("userId", user.Id.ToString()),
-                new Claim("name", user.Name)
+                new Claim("name", $"{user.FirstName} {user.LastName}")
             };
 
             var token = new JwtSecurityToken(
