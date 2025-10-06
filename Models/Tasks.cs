@@ -25,6 +25,8 @@ namespace ProductivIOBackend.Models
         [Required(ErrorMessage = "Please set task status.")]
         public string Status { get; set; } = string.Empty;
 
+        public DateTime? DueDate { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
