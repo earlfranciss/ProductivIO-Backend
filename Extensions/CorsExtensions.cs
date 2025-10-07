@@ -7,7 +7,7 @@ namespace ProductivIOBackend.Extensions
             services.AddCors(opt =>
             {
                 opt.AddPolicy("DevCors", p =>
-                    p.WithOrigins("http://localhost:5173")
+                    p.WithOrigins("http://localhost:5171", "http://localhost:5173")
                         .AllowAnyHeader()
                         .AllowAnyMethod());
             });

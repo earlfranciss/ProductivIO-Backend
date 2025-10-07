@@ -15,9 +15,8 @@ namespace ProductivIOBackend.Repositories
             _db = db;
         }
 
-        // -------------------------
-        // 🔹 FLASHCARDS (SETS)
-        // -------------------------
+
+        // FLASHCARDS 
         public async Task<List<FlashcardsDto>> GetAllFlashcardsAsync(int userId)
         {
             var flashcards = await _db.Flashcards
@@ -103,9 +102,9 @@ namespace ProductivIOBackend.Repositories
             return true;
         }
 
-        // -------------------------
-        // 🔹 QUESTIONS
-        // -------------------------
+
+        // QUESTIONS
+
         public async Task<FlashcardQuestionDto?> AddQuestionAsync(int flashcardId, FlashcardQuestionDto dto)
         {
             var flashcard = await _db.Flashcards.FindAsync(flashcardId);
@@ -156,9 +155,9 @@ namespace ProductivIOBackend.Repositories
             return true;
         }
 
-        // -------------------------
-        // 🔹 ANSWERS
-        // -------------------------
+
+        //  ANSWERS
+
         public async Task<FlashcardAnswerDto?> AddAnswerAsync(int questionId, FlashcardAnswerDto dto)
         {
             var question = await _db.FlashcardQuestions.FindAsync(questionId);

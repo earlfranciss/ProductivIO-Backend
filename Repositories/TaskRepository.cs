@@ -32,6 +32,7 @@ namespace ProductivIOBackend.Repositories
                     CreatedAt = t.CreatedAt,
                     UpdatedAt = t.UpdatedAt
                 })
+                .OrderByDescending(t => t.DueDate)
                 .ToListAsync();
         }
 
